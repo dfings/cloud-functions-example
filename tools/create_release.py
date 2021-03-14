@@ -6,6 +6,7 @@ import click
 import os
 import os.path
 import pathspec
+import time
 import zipfile
 
 
@@ -18,14 +19,13 @@ def load_gcloudignore():
 
 def create_zipfile(target):
     os.makedirs(os.path.dirname(target), exist_ok=True)
-    if os.path.exists(target):
-        os.remove(target)
     gcloudignore = load_gcloudignore()
-    with zipfile.ZipFile(target, mode="w") as z:
+    with zipfile.ZipFile(target, mode="x") as z:
         for f in os.listdir("src"):
             if not gcloudignore.match_file(f):
                 print("Zipping " + f)
                 z.write("src/{}".format(f), arcname=f)
+    print("Created ", target)
 
 
 def upload_zipfile(target, bucket):
@@ -34,7 +34,9 @@ def upload_zipfile(target, bucket):
 
 @click.command()
 @click.option("-b", "--bucket", required=True, help="Bucket path to upload to.")
-@click.option("-v", "--version", required=True, help="Version name.")
+@click.option(
+    "-v", "--version", default=time.strftime("%Y%m%d.%H%M%S"), help="Version name."
+)
 def create_release(bucket, version):
     """Creates a source code zip file and uploads it to gs bucket."""
     target = "build/src-{}.zip".format(version)
