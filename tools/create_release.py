@@ -2,12 +2,14 @@
 
 """Run this from the project root to create a new release."""
 
-import click
+from itertools import filterfalse
 import os
 import os.path
-import pathspec
 import time
 import zipfile
+
+import click
+import pathspec
 
 
 def load_gcloudignore():
@@ -21,15 +23,14 @@ def create_zipfile(target):
     os.makedirs(os.path.dirname(target), exist_ok=True)
     gcloudignore = load_gcloudignore()
     with zipfile.ZipFile(target, mode="x") as z:
-        for f in os.listdir("src"):
-            if not gcloudignore.match_file(f):
-                print("Zipping " + f)
-                z.write("src/{}".format(f), arcname=f)
-    print("Created ", target)
+        for file in filterfalse(gcloudignore.match_file, os.listdir("src")):
+            print(f"Zipping {file}")
+            z.write(f"src/{file}", arcname=file)
+    print(f"Created {target}")
 
 
 def upload_zipfile(target, bucket):
-    os.system("gsutil cp -n {} gs://{}".format(target, bucket))
+    os.system(f"gsutil cp -n {target} gs://{bucket}")
 
 
 @click.command()
@@ -39,7 +40,7 @@ def upload_zipfile(target, bucket):
 )
 def create_release(bucket, version):
     """Creates a source code zip file and uploads it to gs bucket."""
-    target = "build/src-{}.zip".format(version)
+    target = f"build/src-{version}.zip"
     create_zipfile(target)
     upload_zipfile(target, bucket)
 
