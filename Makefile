@@ -9,20 +9,22 @@ FUNCTION_TARGET = handle_request
 GCP_BUCKET=cloud-functions-example-bucket-12345
 RELEASE_LABEL := $(shell date +"%Y%m%d.%H%M%S")
 
+# Creates a zip file in the build/ directory, then copies it
+# to a Google Cloud Storage bucket.
 release:
 	mkdir -p build
 	cd src; \
 	zip -vr ../build/src-$(RELEASE_LABEL).zip . -x@.gcloudignore
 	echo gsutil cp -n ../build/src-$(RELEASE_LABEL).zip gs://$(GCP_BUCKET)
 
+# Runs a local debug server.
 run:
-	# Runs a local debug server.
 	. .venv/bin/activate; \
 	cd src; \
 	functions-framework --target $(FUNCTION_TARGET) --debug
 
+# Runs a local Docker server.
 run_docker:
-	# Runs a local Docker server.
 	pack build $(APP_NAME) \
 		--path src \
 		--env GOOGLE_FUNCTION_TARGET=$(FUNCTION_TARGET) \
@@ -30,13 +32,12 @@ run_docker:
 	docker run --rm -it -p 8080:8080 $(APP_NAME)
 
 test:
-	# Runs the type checker.
 	. ./.venv/bin/activate; \
 	pytest; \
 	pytype src
 
+# Sets up the virtual environment.
 venv:
-	# Sets up the virtual environment.
 	python -m venv .venv; \
 	. .venv/bin/activate; \
 	python -m pip install --upgrade pip wheel; \
