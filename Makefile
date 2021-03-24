@@ -1,4 +1,4 @@
-.PHONY: release run run_docker test venv
+.PHONY: build run run_docker run_docker_image test venv
 
 .DEFAULT_GOAL = run
 .SHELLFLAGS = -ec
@@ -8,6 +8,13 @@ APP_NAME = cloud-functions-example
 FUNCTION_TARGET = handle_request
 GCP_BUCKET=cloud-functions-example-bucket-12345
 RELEASE_LABEL := $(shell date +"%Y%m%d.%H%M%S")
+
+# Builds a local Docker image with pack.
+build:
+	pack build $(APP_NAME) \
+		--path src \
+		--env GOOGLE_FUNCTION_TARGET=$(FUNCTION_TARGET) \
+		--builder gcr.io/buildpacks/builder:v1
 
 # Creates a zip file in the build/ directory, then copies it
 # to a Google Cloud Storage bucket.
@@ -23,12 +30,11 @@ run:
 	cd src; \
 	functions-framework --target $(FUNCTION_TARGET) --debug
 
-# Runs a local Docker server.
-run_docker:
-	pack build $(APP_NAME) \
-		--path src \
-		--env GOOGLE_FUNCTION_TARGET=$(FUNCTION_TARGET) \
-		--builder gcr.io/buildpacks/builder:v1
+# Builds and runs a local Docker image.
+run_docker: build run_docker_image
+
+# Runs a local Docker image.
+run_docker_image:
 	docker run --rm -it -p 8080:8080 $(APP_NAME)
 
 test:
