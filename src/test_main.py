@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from src.main import handle_request
+from main import handle_request
 
 
 def test_valid_number():

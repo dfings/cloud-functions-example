@@ -1,3 +1,6 @@
 .gcloudignore
 .DS_Store
+__pycache__/
 __pycache__/*
+requirements-test.txt
+test_main.py

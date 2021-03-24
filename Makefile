@@ -42,4 +42,4 @@ venv:
 	python -m pip install --upgrade pip wheel; \
 	python -m pip install --upgrade functions-framework; \
 	python -m pip install -r src/requirements.txt; \
-	python -m pip install -r test/requirements.txt
+	python -m pip install -r src/requirements-test.txt
