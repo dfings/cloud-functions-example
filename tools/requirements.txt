@@ -1,4 +1,0 @@
-click==7.1.2
-functions-framework==2.1.2
-pathspec==0.8.1
-pytype
