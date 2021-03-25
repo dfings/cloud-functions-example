@@ -1,4 +1,4 @@
-.PHONY: build run run_docker run_docker_image test venv
+.PHONY: build clean run run_docker run_docker_image test venv
 
 .DEFAULT_GOAL = run
 .SHELLFLAGS = -ec
@@ -9,6 +9,10 @@ FUNCTION_TARGET = handle_request
 GCP_BUCKET=cloud-functions-example-bucket-12345
 RELEASE_LABEL := $(shell date +"%Y%m%d.%H%M%S")
 
+# Deletes the __pycache__ directories.
+clean:
+	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+
 # Builds a local Docker image with pack.
 build:
 	pack build $(APP_NAME) \
@@ -18,7 +22,7 @@ build:
 
 # Creates a zip file in the build/ directory, then copies it
 # to a Google Cloud Storage bucket.
-release:
+release: test clean
 	mkdir -p build
 	cd src; \
 	zip -vr ../build/src-$(RELEASE_LABEL).zip . -x@.gcloudignore
