@@ -1,7 +1,8 @@
+import flask
 import numpy
 
 
-def handle_request(request):
+def handle_request(request: flask.Request) -> str:
     number = request.path[1:]
     try:
         return str(numpy.pi * numpy.double(number))

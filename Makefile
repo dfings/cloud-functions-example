@@ -44,7 +44,9 @@ run_docker_image:
 test:
 	. ./.venv/bin/activate; \
 	pytest; \
-	pytype src
+	pytype src; \
+	mypy --strict --ignore-missing-imports src; \
+	prospector
 
 # Sets up the virtual environment.
 venv:

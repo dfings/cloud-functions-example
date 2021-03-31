@@ -1,2 +1,4 @@
+mypy
+prospector
 pytest
 pytype
