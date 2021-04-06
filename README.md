@@ -1,4 +1,4 @@
-# cloud-functions-example
+# python-functions-framework-example
 
 Example of how to structure a Python Functions Framework respository.
 
